@@ -1,6 +1,7 @@
 ﻿using System;
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using System.Data;
 using System.Security.Claims;
 
 namespace Clipess.DBClient.EntityModels
@@ -28,6 +29,7 @@ namespace Clipess.DBClient.EntityModels
         public int EmployeeTypeID { get; set; }
         public int RoleID { get; set; }
         public int DepartmentID { get; set; }
+       // public Department? Department { get; set; }
         public int MaritalStatusID { get; set; }
         public DateTime CreatedDate { get; set; }
         public int CreatedBy { get; set; }

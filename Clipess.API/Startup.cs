@@ -19,6 +19,8 @@ using Hangfire;
 using Hangfire.SqlServer;
 using Clipess.API.Controllers;
 using Clipess.DBClient.Infrastructure;
+using Microsoft.AspNetCore.Http;
+using CloudinaryDotNet;//for clou
 
 
 namespace Clipess.API
@@ -37,9 +39,14 @@ namespace Clipess.API
 
         public void ConfigureServices(IServiceCollection services)
         {
+
              services.AddCors(c =>
             {
                 c.AddPolicy("AllowAnyOrigins", options => options.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
+                 c.AddPolicy(AllowAnyOrigins, builder =>
+                {
+                    builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+                });
                 c.AddPolicy("AllowSpecificOrigin",
                     builder =>  builder
                     .WithOrigins("http://localhost:3000")
@@ -47,6 +54,7 @@ namespace Clipess.API
                     .AllowAnyMethod()
                     .AllowCredentials()
                     );
+
                     if (_env.IsDevelopment())
                 {
                     c.AddPolicy("AllowReactFrontend", builder =>
@@ -95,6 +103,12 @@ namespace Clipess.API
             services.AddScoped<ITeamRepository, EFTeamRepository>();
             services.AddScoped<IClientRepository, EFClientRepository>();
             services.AddScoped<ITaskPdfGenerationRepository,EFTaskPdfGenerationRepository>();
+
+            services.AddScoped<IInventoryTypeRepository, EFInventoryTypeRepository>();
+            services.AddScoped<IInventoryRepository, EFInventoryRepository>();
+            services.AddScoped<IEmployeeInventoryRepository, EFEmployeeInventoryRepository>();
+            services.AddScoped<IRequestRepository, EFRequestRepository>();
+            services.AddScoped<IInventoryReportRepository, EFInventoryReportRepository>();
 
             // Add controllers
             services.AddControllers();
@@ -151,9 +165,13 @@ namespace Clipess.API
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseHttpsRedirection();
+            app.UseRouting();
+            app.UseCors(AllowAnyOrigins);
 
-
-
+            // Serve the static files for the React frontend
+            app.UseStaticFiles();
+            app.UseSpaStaticFiles();
 
             // Configure default file mapping for the React SPA
             app.UseDefaultFiles(new DefaultFilesOptions

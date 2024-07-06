@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore.SqlServer;
 using Microsoft.Extensions.Logging;
+using System.Reflection.Metadata;
 
 namespace Clipess.DBClient.Repositories
 {
@@ -33,9 +34,9 @@ namespace Clipess.DBClient.Repositories
         public DbSet<MonthlyTimeEntry> MonthlyTimeEntries { get; set; }
         public DbSet<MonthlyWorkingDay> MonthlyWorkingDays { get; set; }
         public DbSet<TimeEntryNotification> TimeEntryNotifications { get; set; }
-        public DbSet<Employee> Employees { get; set; }
+        
 
-         public DbSet<Employee> Employees { get; set;}
+       
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<UserNotification> UserNotifications { get; set; }
         public DbSet<ProjectTask> ProjectTasks { get; set; }
@@ -43,6 +44,11 @@ namespace Clipess.DBClient.Repositories
         public DbSet<Team> Teams { get; set; }
         public DbSet<Client> Clients { get; set; }
         public DbSet<FormUser> Users { get; set; }
+
+        public DbSet<Request> Requests { get; set; }
+        public DbSet<InventoryType> InventoryTypes { get; set; }
+        public DbSet<Inventory> Inventories { get; set; }
+       
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
