@@ -18,6 +18,7 @@ using System.Text;
 using Hangfire;
 using Hangfire.SqlServer;
 using Clipess.API.Controllers;
+using Clipess.DBClient.Infrastructure;
 
 
 namespace Clipess.API
@@ -31,21 +32,47 @@ namespace Clipess.API
         public Startup(IConfiguration configuration, IWebHostEnvironment env)
         {
             Configuration = configuration;
-            _env = env; // Assign the environment variable
+            _env = env; 
         }
-
-         public Startup(IConfiguration configuration)
-        {
-            Configuration = configuration;
-        } 
 
         public void ConfigureServices(IServiceCollection services)
         {
              services.AddCors(c =>
             {
-                c.AddPolicy(AllowAnyOrigins, options => options.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
+                c.AddPolicy("AllowAnyOrigins", options => options.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
+                c.AddPolicy("AllowSpecificOrigin",
+                    builder =>  builder
+                    .WithOrigins("http://localhost:3000")
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .AllowCredentials()
+                    );
+                    if (_env.IsDevelopment())
+                {
+                    c.AddPolicy("AllowReactFrontend", builder =>
+                    {
+                        builder.WithOrigins("http://localhost:3000")
+                               .AllowAnyHeader()
+                               .AllowAnyMethod()
+                               .AllowCredentials();
+                    });
+                }
+                else
+                {
+                    c.AddPolicy("AllowSpecificOrigins", builder =>
+                    {
+                        builder.AllowAnyOrigin() 
+                               .AllowAnyHeader()
+                               .AllowAnyMethod()
+                               .AllowCredentials();
+                    });
+                }
             }); 
+           
+   
 
+          
+         
             // Database configuration
             services.AddDbContext<EFDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")))
             // Add repositories
@@ -61,12 +88,21 @@ namespace Clipess.API
             services.AddScoped<IPdfGenerationRepository, EFPdfGenerationRepository>();
             services.AddScoped<IAttendanceNotificationRepository, EFAttendanceNotificationRepository>();
 
+            services.AddScoped<INotificationRepository, EFNotificationRepository>();
+           
+            services.AddScoped<IProjectRepository, EFProjectRepository>();       
+            services.AddScoped<ITaskRepository, EFTaskRepository>();
+            services.AddScoped<ITeamRepository, EFTeamRepository>();
+            services.AddScoped<IClientRepository, EFClientRepository>();
+            services.AddScoped<ITaskPdfGenerationRepository,EFTaskPdfGenerationRepository>();
+
             // Add controllers
             services.AddControllers();
 
             // Add SignalR
             services.AddSignalR();
 
+            services.AddSingleton(provider => Configuration);
             // cloudinary
             services.AddSingleton<IConfiguration>(provider => Configuration);
 
@@ -114,6 +150,17 @@ namespace Clipess.API
             {
                 app.UseDeveloperExceptionPage();
             }
+
+
+
+
+
+            // Configure default file mapping for the React SPA
+            app.UseDefaultFiles(new DefaultFilesOptions
+            {
+                DefaultFileNames = new[] { "index.html" }
+            });
+            
             else
             {
                 app.UseExceptionHandler("/Home/Error");
@@ -121,7 +168,7 @@ namespace Clipess.API
             }
 
             app.UseHttpsRedirection();
-            app.UseCors(AllowAnyOrigins);
+            app.UseCors("AllowAnyOrigins");
             app.UseCors(env.IsDevelopment() ? "AllowReactFrontend" : "AllowSpecificOrigins");
 
             app.UseStaticFiles();
@@ -131,6 +178,10 @@ namespace Clipess.API
                     Path.Combine(Directory.GetCurrentDirectory(), "Root"))
             });
 
+            app.UseCors("AllowSpecificOrigin");
+            app.UseCors("CorsPolicy");
+            
+            
              app.UseStaticFiles(new StaticFileOptions
             {
                 FileProvider = new PhysicalFileProvider(
@@ -147,8 +198,10 @@ namespace Clipess.API
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHub<SignalServer>("/signalServer");
                 endpoints.MapHub<NotificationHub>("/notificationHub");
             });
+
 
             app.UseSpa(spa =>
             {

@@ -35,6 +35,15 @@ namespace Clipess.DBClient.Repositories
         public DbSet<TimeEntryNotification> TimeEntryNotifications { get; set; }
         public DbSet<Employee> Employees { get; set; }
 
+         public DbSet<Employee> Employees { get; set;}
+        public DbSet<Notification> Notifications { get; set; }
+        public DbSet<UserNotification> UserNotifications { get; set; }
+        public DbSet<ProjectTask> ProjectTasks { get; set; }
+        public DbSet<Project> Projects { get; set; }
+        public DbSet<Team> Teams { get; set; }
+        public DbSet<Client> Clients { get; set; }
+        public DbSet<FormUser> Users { get; set; }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)

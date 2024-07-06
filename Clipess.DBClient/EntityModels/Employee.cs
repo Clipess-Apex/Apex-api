@@ -73,5 +73,4 @@ namespace Clipess.DBClient.EntityModels
         public int DepartmentID { get; set; }
         public int MaritalStatusID { get; set; }
     }
-
 }
