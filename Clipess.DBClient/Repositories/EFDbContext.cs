@@ -16,8 +16,26 @@ namespace Clipess.DBClient.Repositories
             _configuration = configuration;
         }
 
-       
-        public DbSet<Employee> Employees { get; set;}
+        public EFDbContext(DbContextOptions<EFDbContext> options) : base(options) { }
+
+        public DbSet<User> Users { get; set; }
+        public DbSet<Leave> Leaves { get; set; }
+        public DbSet<LeaveState> LeaveStates { get; set; }
+        public DbSet<LeaveType> LeaveTypes { get; set; }
+        public DbSet<LeaveNotification> LeaveNotifications { get; set; }
+        public DbSet<Employee> Employees { get; set; }
+        public DbSet<Role> Roles { get; set; }
+
+        
+        public DbSet<TimeEntryType> TimeEntryTypes { get; set; }
+        public DbSet<TimeEntry> TimeEntries { get; set; }
+        public DbSet<DailyTimeEntry> DailyTimeEntries { get; set; }
+        public DbSet<MonthlyTimeEntry> MonthlyTimeEntries { get; set; }
+        public DbSet<MonthlyWorkingDay> MonthlyWorkingDays { get; set; }
+        public DbSet<TimeEntryNotification> TimeEntryNotifications { get; set; }
+        public DbSet<Employee> Employees { get; set; }
+
+         public DbSet<Employee> Employees { get; set;}
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<UserNotification> UserNotifications { get; set; }
         public DbSet<ProjectTask> ProjectTasks { get; set; }
@@ -25,13 +43,29 @@ namespace Clipess.DBClient.Repositories
         public DbSet<Team> Teams { get; set; }
         public DbSet<Client> Clients { get; set; }
         public DbSet<FormUser> Users { get; set; }
-   
 
-        
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if (!optionsBuilder.IsConfigured)
+            {
+                var connectionString = _configuration.GetConnectionString("DefaultConnection");
+
+                optionsBuilder.UseSqlServer(connectionString, sqlServerOptions =>
+                {
+                    sqlServerOptions.EnableRetryOnFailure(
+                        maxRetryCount: 5,
+                        maxRetryDelay: TimeSpan.FromSeconds(30),
+                        errorNumbersToAdd: null
+                    );
+                });
+                optionsBuilder.LogTo(Console.WriteLine, new[] { DbLoggerCategory.Database.Command.Name }, LogLevel.Information);
+            }
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            
+            modelBuilder.Entity<Employee>().ToTable("Employees");
         }
-
     }
 }

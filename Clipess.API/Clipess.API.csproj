@@ -4,11 +4,13 @@
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <UserSecretsId>b43f9b9d-77c1-444a-aa3d-69cd1a6b3bec</UserSecretsId>
+
+  
+  <UserSecretsId>b43f9b9d-77c1-444a-aa3d-69cd1a6b3bec</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
-    
+    <PackageReference Include="CloudinaryDotNet" Version="1.26.2" />
     <PackageReference Include="Hangfire" Version="1.8.14" />
     <PackageReference Include="Hangfire.AspNetCore" Version="1.8.14" />
     <PackageReference Include="Hangfire.Core" Version="1.8.14" />

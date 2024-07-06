@@ -1,12 +1,12 @@
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
-using System;
+using System.Security.Claims;
 
 namespace Clipess.DBClient.EntityModels
 {
     public class Employee
     {
-        [Key]
         public int EmployeeID { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
@@ -34,7 +34,7 @@ namespace Clipess.DBClient.EntityModels
         public bool Deleted { get; set; }
         public DateTime? DeletedDate { get; set; }
         public int? DeletedBy { get; set; }
-
+        public Role Role { get; set; }
     }
 
     public class LoginModel
@@ -44,6 +44,11 @@ namespace Clipess.DBClient.EntityModels
 
     }
 
+    public class Role
+    {
+        public int RoleID { get; set; }
+        public string RoleName { get; set; }
+    }
 
     public class EmployeeDto
     {
