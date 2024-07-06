@@ -1,3 +1,7 @@
+using Microsoft.AspNetCore.Hosting;
+using QuestPDF.Infrastructure;
+using System.Reflection;
+
 namespace Clipess.API
 {
     public class Program
@@ -5,14 +9,27 @@ namespace Clipess.API
         public static void Main(string[] args)
         {
             // Build and run the host
+            QuestPDF.Settings.License = LicenseType.Community;
             CreateHostBuilder(args).Build().Run();
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
-        .ConfigureWebHostDefaults(webBuilder =>
+            .ConfigureWebHostDefaults(webBuilder =>
+            {
+                webBuilder.UseStartup<Startup>();
+            })
+            .ConfigureLogging(logging =>
+            {
+                logging.ClearProviders();
+                logging.AddConsole();
+                logging.SetMinimumLevel(LogLevel.Information);
+            })
+            .ConfigureAppConfiguration((hostingContext, config) =>
         {
-            webBuilder.UseStartup<Startup>();
+            config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
         });
+
     }
 }
+

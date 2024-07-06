@@ -1,27 +1,22 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
+using System.Data;
+using System.Security.Claims;
 
 namespace Clipess.DBClient.EntityModels
 {
     public class Employee
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int EmployeeID { get; set; }
-        [Required]
         public string FirstName { get; set; }
-        [Required]
         public string LastName { get; set; }
-        [DataType(DataType.Date)]
         public DateTime DateOfBirth { get; set; }
         public string NIC { get; set; }
-        [Required]
-        [EmailAddress]
         public string PersonalEmail { get; set; }
-        [Required]
-        [EmailAddress]
         public string CompanyEmail { get; set; }
-        public string Password { get; set; }
+        public string Password { get; set; } 
         public string MobileNumber { get; set; }
         public string TelephoneNumber { get; set; }
         public string Address { get; set; }

@@ -1,14 +1,18 @@
 ﻿using Clipess.DBClient.Contracts;
 using Clipess.DBClient.EntityModels;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Clipess.DBClient.Repositories
 {
     public class EFEmployeeRepository : IEmployeeRepository
     {
         public EFDbContext DbContext { get; set; }
-
         public EFEmployeeRepository(EFDbContext dbContext)
         {
             DbContext = dbContext;
