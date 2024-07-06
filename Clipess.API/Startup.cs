@@ -21,6 +21,7 @@ using Clipess.API.Controllers;
 using Clipess.DBClient.Infrastructure;
 using Microsoft.AspNetCore.Http;
 using CloudinaryDotNet;//for clou
+using Clipess.API.Properties.Services;
 
 
 namespace Clipess.API
@@ -88,7 +89,6 @@ namespace Clipess.API
             services.AddScoped<ILeaveRepository, EFLeaveRepository>();
             services.AddScoped<ILeaveTypeRepository, EFLeaveTypeRepository>();
             services.AddScoped<ILeaveNotificationRepository, EFLeaveNotificationRepository>();
-            services.AddScoped<IEmployeeRepository, EFEmployeeRepository>();
             services.AddScoped<EmailService>();
             services.AddScoped<AuthService>();
 
@@ -109,6 +109,12 @@ namespace Clipess.API
             services.AddScoped<IEmployeeInventoryRepository, EFEmployeeInventoryRepository>();
             services.AddScoped<IRequestRepository, EFRequestRepository>();
             services.AddScoped<IInventoryReportRepository, EFInventoryReportRepository>();
+
+            services.AddScoped<IEmployeeRepository, EFEmployeeRepository>();            
+            services.AddScoped<IEmployeeTypeRepository, EFEmployeeTypeRepository>();
+            services.AddScoped<IMaritalStatusRepository, EFMaritalStatusRepository>();  
+            services.AddScoped<IDepartmentRepository, EFDepartmentRepository>();
+            services.AddScoped<IRoleRepository, EFRoleRepository>();
 
             // Add controllers
             services.AddControllers();
@@ -134,6 +140,32 @@ namespace Clipess.API
                 configuration.RootPath = "Root";
             });
 
+            // JWT Authentication configuration
+            var jwtSettingsSection = Configuration.GetSection("Jwt");
+            services.Configure<JwtSettings>(jwtSettingsSection);
+
+            var jwtSettings = jwtSettingsSection.Get<JwtSettings>();
+            var key = Encoding.UTF8.GetBytes(jwtSettings.Key);
+
+            services.AddSingleton(jwtSettings);
+
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = jwtSettings.Issuer,
+                    ValidAudience = jwtSettings.Audience,
+                    IssuerSigningKey = new SymmetricSecurityKey(key)
+                };
+            });
             services.AddHangfire(configuration => configuration
            .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
            .UseSimpleAssemblyNameTypeSerializer()
@@ -154,6 +186,7 @@ namespace Clipess.API
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseCors("AllowAllOrigins");
             var provider = new FileExtensionContentTypeProvider();
             provider.Mappings[".res"] = "application/octet-stream";
             provider.Mappings[".pexe"] = "application/x-pnacl";
@@ -164,6 +197,19 @@ namespace Clipess.API
             {
                 app.UseDeveloperExceptionPage();
             }
+            
+            
+            else
+            {
+                app.UseExceptionHandler("/Home/Error");
+                app.UseHsts();
+            }
+            
+            
+            
+            app.UseDefaultFiles();
+            
+            
 
             app.UseHttpsRedirection();
             app.UseRouting();
@@ -178,12 +224,6 @@ namespace Clipess.API
             {
                 DefaultFileNames = new[] { "index.html" }
             });
-            
-            else
-            {
-                app.UseExceptionHandler("/Home/Error");
-                app.UseHsts();
-            }
 
             app.UseHttpsRedirection();
             app.UseCors("AllowAnyOrigins");

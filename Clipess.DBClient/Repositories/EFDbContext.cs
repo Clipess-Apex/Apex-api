@@ -1,5 +1,6 @@
 ﻿using Clipess.DBClient.EntityModels;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore.SqlServer;
 using Microsoft.Extensions.Logging;
@@ -48,6 +49,12 @@ namespace Clipess.DBClient.Repositories
         public DbSet<Request> Requests { get; set; }
         public DbSet<InventoryType> InventoryTypes { get; set; }
         public DbSet<Inventory> Inventories { get; set; }
+
+        public DbSet<Department> Departments { get; set; }
+        public DbSet<Employee> Employees { get; set; }
+        public DbSet<EmployeeType> EmployeeTypes { get; set; }
+        public DbSet<MaritalStatus> MaritalStatus { get; set; }
+        public DbSet<Role> Roles { get; set; }
        
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -70,6 +77,11 @@ namespace Clipess.DBClient.Repositories
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
+            // Configure the EmployeeID to be auto-incremented if not already done
+            modelBuilder.Entity<Employee>()
+                .Property(e => e.EmployeeID)
+                .ValueGeneratedOnAdd();
             
             modelBuilder.Entity<Employee>().ToTable("Employees");
         }
