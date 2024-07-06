@@ -12,6 +12,6 @@ namespace Clipess.DBClient.EntityModels
         [Key]
         public int NotificationId { get; set; }
         public string NotificationText { get; set; }
-       // public bool IsRead { get; set; } = false;
+       
     }
 }

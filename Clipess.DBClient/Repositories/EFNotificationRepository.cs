@@ -2,12 +2,6 @@
 using Clipess.DBClient.EntityModels;
 using Microsoft.AspNetCore.SignalR;
 using Clipess.DBClient.Infrastructure;
-using Clipess.DBClient.Repositories;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
 namespace Clipess.DBClient.Repositories
 {
     public class EFNotificationRepository : INotificationRepository
@@ -25,52 +19,60 @@ namespace Clipess.DBClient.Repositories
         {
             var createdNotification = new UserNotification
             {
-                UserId = notification.UserId,
+                EmployeeId = notification.EmployeeId,
                 NotificationId = notification.NotificationId,
                 IsRead = false,
-                
+                CreatedDate = DateTime.UtcNow
+
             };
             _context.UserNotifications.Add(createdNotification);
             _context.SaveChanges();
-        }
 
-        public List<string> GetNotifications(int userId)
+        } 
+
+        public  List<String> GetNotifications(int EmployeeId)
         {
-            var userNotifications = _context.UserNotifications
-                                            .Where(n => n.UserId == userId && !n.IsRead)
-                                            .ToList();
+            var userNotification = _context.UserNotifications
+                                        .Where(n => n.EmployeeId == EmployeeId && !n.IsRead).ToList();
 
-            var tableNotifications = _context.Notifications.ToList();
+            var tableNotification = _context.Notifications.ToList();
 
-            var relevantNotifications = new List<string>();
+            var relevantNotification = new List<String>();
 
-            foreach (var userNotify in userNotifications)
+            
+            foreach (UserNotification userNotify in userNotification)
             {
-                foreach (var notification in tableNotifications)
+                foreach(Notification notification in tableNotification)
                 {
-                    if (userNotify.NotificationId == notification.NotificationId)
+                    if ((userNotify.NotificationId) == (notification.NotificationId))
                     {
-                        relevantNotifications.Add(notification.NotificationText);
+                        relevantNotification.Add(notification.NotificationText);
                     }
                 }
+                
+
             }
-            return relevantNotifications;
+            return relevantNotification;
+
         }
 
-        public List<string> GetNotify(int notificationId)
+        public  List<String> GetNotify(int notificatioId)
         {
-            var notifications = _context.Notifications
-                                         .Where(e => e.NotificationId == notificationId)
-                                         .Select(e => e.NotificationText)
-                                         .ToList();
-            return notifications;
+            var notification =  _context.Notifications
+                 .Where(e => e.NotificationId == notificatioId)
+                 .Select(e => e.NotificationText)
+                 .ToList();
+            return notification;
+
+
         }
 
-        public void ReadNotification(int userId)
+
+
+        public void ReadNotification(int EmployeeId)
         {
             var notifications = _context.UserNotifications
-                                        .Where(n => n.UserId == userId && !n.IsRead)
-                                        .ToList();
+                                        .Where(n => n.EmployeeId == EmployeeId  && !n.IsRead).ToList();
 
             foreach (var notification in notifications)
             {

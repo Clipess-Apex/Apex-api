@@ -1,13 +1,6 @@
-﻿using System;
-using System.Diagnostics;
-using System.Threading.Tasks;
-using Clipess.DBClient.Contracts;
-using Clipess.DBClient.EntityModels;
-using Clipess.DBClient.Infrastructure;
+﻿using System.Diagnostics;
 using Clipess.DBClient.Repositories;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace Clipess.DBClient.Infrastructure
 {
@@ -17,14 +10,11 @@ namespace Clipess.DBClient.Infrastructure
     }
     public class SignalServer : Hub<INotificationClient>
     {
-
         private readonly EFDbContext _dbContext;
         public SignalServer(EFDbContext dbContext)
         {
             _dbContext = dbContext;
         }
-
-
         public override async Task OnConnectedAsync()
         {
             var connectionId = Context.ConnectionId;
@@ -39,10 +29,8 @@ namespace Clipess.DBClient.Infrastructure
             {
                 Debug.WriteLine($"User ID : {item.Key},Connection ID : {item.Value}");
             }
-
             await base.OnConnectedAsync();
         }
-
         public async Task SendNotificationToUser(string connectionId, List<string> notifications)
         {
             // Call the interface method directly on the client proxy
@@ -51,5 +39,4 @@ namespace Clipess.DBClient.Infrastructure
 
     }
 }
-
 

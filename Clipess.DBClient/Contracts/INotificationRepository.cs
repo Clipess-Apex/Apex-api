@@ -12,7 +12,6 @@ namespace Clipess.DBClient.Contracts
         void CreateNotification(UserNotification notification);
         void ReadNotification(int userNotificationId);
         List<String> GetNotifications(int userId);
-
         List<String> GetNotify(int notificationId);
     }
 }
