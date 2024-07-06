@@ -1,3 +1,4 @@
+
 ﻿using Clipess.API.Services;
 using Clipess.DBClient.Contracts;
 using Clipess.DBClient.Repositories;
@@ -14,12 +15,17 @@ using Microsoft.IdentityModel.Tokens;
 using System;
 using System.IO;
 using System.Text;
+using Hangfire;
+using Hangfire.SqlServer;
+using Clipess.API.Controllers;
+
 
 namespace Clipess.API
 {
     public class Startup
     {
         private readonly IWebHostEnvironment _env; // Define the environment variable
+        private const string AllowAnyOrigins = "AllowAnyOrigin";
         public IConfiguration Configuration { get; }
 
         public Startup(IConfiguration configuration, IWebHostEnvironment env)
@@ -28,45 +34,20 @@ namespace Clipess.API
             _env = env; // Assign the environment variable
         }
 
+         public Startup(IConfiguration configuration)
+        {
+            Configuration = configuration;
+        } 
+
         public void ConfigureServices(IServiceCollection services)
         {
-            // Configure CORS
-            services.AddCors(options =>
+             services.AddCors(c =>
             {
-                if (_env.IsDevelopment())
-                {
-                    options.AddPolicy("AllowReactFrontend", builder =>
-                    {
-                        builder.WithOrigins("http://localhost:3000")
-                               .AllowAnyHeader()
-                               .AllowAnyMethod()
-                               .AllowCredentials();
-                    });
-                }
-                else
-                {
-                    options.AddPolicy("AllowSpecificOrigins", builder =>
-                    {
-                        builder.AllowAnyOrigin() // Replace with your production URL
-                               .AllowAnyHeader()
-                               .AllowAnyMethod()
-                               .AllowCredentials();
-                    });
-                }
-            });
+                c.AddPolicy(AllowAnyOrigins, options => options.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
+            }); 
 
             // Database configuration
-            services.AddDbContext<EFDbContext>(options =>
-            {
-                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"), sqlOptions =>
-                {
-                    sqlOptions.EnableRetryOnFailure(
-                        maxRetryCount: 5,
-                        maxRetryDelay: TimeSpan.FromSeconds(30),
-                        errorNumbersToAdd: null);
-                });
-            });
-
+            services.AddDbContext<EFDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")))
             // Add repositories
             services.AddScoped<IUserRepository, EFUserRepository>();
             services.AddScoped<ILeaveRepository, EFLeaveRepository>();
@@ -76,52 +57,59 @@ namespace Clipess.API
             services.AddScoped<EmailService>();
             services.AddScoped<AuthService>();
 
+            services.AddScoped<ITimeEntryRepository, EFTimeEntryRepository>();
+            services.AddScoped<IPdfGenerationRepository, EFPdfGenerationRepository>();
+            services.AddScoped<IAttendanceNotificationRepository, EFAttendanceNotificationRepository>();
+
             // Add controllers
             services.AddControllers();
 
             // Add SignalR
             services.AddSignalR();
 
+            // cloudinary
+            services.AddSingleton<IConfiguration>(provider => Configuration);
+
+
             // Add logging
             services.AddLogging(builder =>
             {
+                // Configure Log4Net
                 builder.AddLog4Net();
             });
 
-            // SPA static files configuration
+            // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
             {
                 configuration.RootPath = "Root";
             });
 
-            // JWT Authentication configuration
-            var jwtSettingsSection = Configuration.GetSection("Jwt");
-            services.Configure<JwtSettings>(jwtSettingsSection);
+            services.AddHangfire(configuration => configuration
+           .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+           .UseSimpleAssemblyNameTypeSerializer()
+           .UseRecommendedSerializerSettings()
+           .UseSqlServerStorage(Configuration.GetConnectionString("DefaultConnection"), new SqlServerStorageOptions
+           {
+               CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
+               SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5),
+               QueuePollInterval = TimeSpan.Zero,
+               UseRecommendedIsolationLevel = true,
+               UsePageLocksOnDequeue = true,
+               DisableGlobalLocks = true
+           }));
 
-            var jwtSettings = jwtSettingsSection.Get<JwtSettings>();
-            var key = Encoding.UTF8.GetBytes(jwtSettings.Key);
-
-            services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            }).AddJwtBearer(options =>
-            {
-                options.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
-                    ValidIssuer = jwtSettings.Issuer,
-                    ValidAudience = jwtSettings.Audience,
-                    IssuerSigningKey = new SymmetricSecurityKey(key)
-                };
-            });
+            services.AddHangfireServer();
         }
 
+        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            var provider = new FileExtensionContentTypeProvider();
+            provider.Mappings[".res"] = "application/octet-stream";
+            provider.Mappings[".pexe"] = "application/x-pnacl";
+            provider.Mappings[".nmf"] = "application/octet-stream";
+            provider.Mappings[".mem"] = "application/octet-stream";
+            provider.Mappings[".wasm"] = "application/wasm";
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -133,7 +121,7 @@ namespace Clipess.API
             }
 
             app.UseHttpsRedirection();
-
+            app.UseCors(AllowAnyOrigins);
             app.UseCors(env.IsDevelopment() ? "AllowReactFrontend" : "AllowSpecificOrigins");
 
             app.UseStaticFiles();
@@ -143,8 +131,16 @@ namespace Clipess.API
                     Path.Combine(Directory.GetCurrentDirectory(), "Root"))
             });
 
-            app.UseRouting();
+             app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider(
+                Path.Combine(Directory.GetCurrentDirectory(), "Root")),
+                ContentTypeProvider = provider
+            });
 
+            app.UseRouting();
+            app.UseSpaStaticFiles();
+            app.UseDefaultFiles();
             app.UseAuthentication();
             app.UseAuthorization();
 
@@ -158,6 +154,13 @@ namespace Clipess.API
             {
                 spa.Options.SourcePath = "Root";
             });
+
+              app.UseHangfireDashboard();
+
+            //RecurringJob.AddOrUpdate<PdfGenerationController>(
+            //"Generate-PDF",
+            //controller => controller.GenerateEmployeeAttendancePDF(),
+            // "25 23 * * *");
         }
     }
 

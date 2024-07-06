@@ -16,6 +16,8 @@ namespace Clipess.DBClient.Repositories
             _configuration = configuration;
         }
 
+        public EFDbContext(DbContextOptions<EFDbContext> options) : base(options) { }
+
         public DbSet<User> Users { get; set; }
         public DbSet<Leave> Leaves { get; set; }
         public DbSet<LeaveState> LeaveStates { get; set; }
@@ -23,6 +25,15 @@ namespace Clipess.DBClient.Repositories
         public DbSet<LeaveNotification> LeaveNotifications { get; set; }
         public DbSet<Employee> Employees { get; set; }
         public DbSet<Role> Roles { get; set; }
+
+        
+        public DbSet<TimeEntryType> TimeEntryTypes { get; set; }
+        public DbSet<TimeEntry> TimeEntries { get; set; }
+        public DbSet<DailyTimeEntry> DailyTimeEntries { get; set; }
+        public DbSet<MonthlyTimeEntry> MonthlyTimeEntries { get; set; }
+        public DbSet<MonthlyWorkingDay> MonthlyWorkingDays { get; set; }
+        public DbSet<TimeEntryNotification> TimeEntryNotifications { get; set; }
+        public DbSet<Employee> Employees { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
