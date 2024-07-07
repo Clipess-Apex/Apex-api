@@ -76,16 +76,16 @@ namespace Clipess.API
                                .AllowCredentials();
                     });
                 }
-            }); 
-           
-   
+            });
 
-          
-         
+
+
+
+
             // Database configuration
-            services.AddDbContext<EFDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")))
+            services.AddDbContext<EFDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             // Add repositories
-            services.AddScoped<IUserRepository, EFUserRepository>();
+
             services.AddScoped<ILeaveRepository, EFLeaveRepository>();
             services.AddScoped<ILeaveTypeRepository, EFLeaveTypeRepository>();
             services.AddScoped<ILeaveNotificationRepository, EFLeaveNotificationRepository>();

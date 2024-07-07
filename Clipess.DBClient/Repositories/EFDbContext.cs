@@ -20,7 +20,6 @@ namespace Clipess.DBClient.Repositories
 
         public EFDbContext(DbContextOptions<EFDbContext> options) : base(options) { }
 
-        public DbSet<User> Users { get; set; }
         public DbSet<Leave> Leaves { get; set; }
         public DbSet<LeaveState> LeaveStates { get; set; }
         public DbSet<LeaveType> LeaveTypes { get; set; }
@@ -51,10 +50,8 @@ namespace Clipess.DBClient.Repositories
         public DbSet<Inventory> Inventories { get; set; }
 
         public DbSet<Department> Departments { get; set; }
-        public DbSet<Employee> Employees { get; set; }
         public DbSet<EmployeeType> EmployeeTypes { get; set; }
         public DbSet<MaritalStatus> MaritalStatus { get; set; }
-        public DbSet<Role> Roles { get; set; }
        
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

@@ -52,7 +52,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Services\" />
     <Folder Include="wwwroot\uploads\" />
     <Folder Include="Views\Manager\" />
     <Folder Include="Clipess\" />
