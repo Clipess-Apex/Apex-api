@@ -48,6 +48,8 @@ namespace Clipess.DBClient.Repositories
         public DbSet<Request> Requests { get; set; }
         public DbSet<InventoryType> InventoryTypes { get; set; }
         public DbSet<Inventory> Inventories { get; set; }
+        public DbSet<InventoryUserNotification> InventoryUserNotifications { get; set; }
+      
 
         public DbSet<Department> Departments { get; set; }
         public DbSet<EmployeeType> EmployeeTypes { get; set; }
