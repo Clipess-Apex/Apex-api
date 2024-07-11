@@ -44,6 +44,7 @@ namespace Clipess.DBClient.Repositories
             {
                 // Update the employeeId in the inventory based on the request
                 inventory.EmployeeId = request.EmployeeId;
+                inventory.AssignedDate = DateTime.Now;
             }
         }
 

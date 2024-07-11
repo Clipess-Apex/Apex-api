@@ -43,7 +43,7 @@ namespace Clipess.API.Controllers
                 return NotFound("Inventory type not found.");
             }
 
-            var inventories = _inventoryReportRepository.GetInventoriesByType(inventoryTypeId).ToList();
+            var inventories = _inventoryReportRepository.GetInventoriesByType(inventoryTypeId).Where(x => !x.Deleted).ToList();
 
             var document = Document.Create(container =>
             {

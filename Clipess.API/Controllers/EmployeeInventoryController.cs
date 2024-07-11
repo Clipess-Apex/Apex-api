@@ -25,10 +25,10 @@ namespace Clipess.API.Controllers
         {
             try
             {
-                var inventoryTypes = _EmployeeRepository.GetEmployees().ToList();
-                if (inventoryTypes != null && inventoryTypes.Any())
+                var employees = _EmployeeRepository.GetEmployees().Where(x => !x.Deleted).ToList();
+                if (employees != null && employees.Any())
                 {
-                    return Ok(inventoryTypes);
+                    return Ok(employees);
                 }
                 return NoContent();
             }

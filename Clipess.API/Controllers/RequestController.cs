@@ -148,6 +148,7 @@ namespace Clipess.API.Controllers
                     request.InventoryId = requestUpdate.InventoryId;
                     
                     
+                    
                 }
 
                 _requestRepository.AcceptRequest(request);
@@ -406,6 +407,24 @@ namespace Clipess.API.Controllers
             }
         }
 
+        [Route("NoOfUnreadRequestsforEmployee/{employeeId}")]
+        [HttpGet]
+
+        public ActionResult GetNoOfUnreadRequests(int employeeId)
+        {
+            try
+            {
+                var unreadRequests = _requestRepository.GetNoOfUnreadRequests().Where(x => !x.Deleted && !x.IsRead && x.EmployeeId == employeeId).ToList();
+                var unreadRequestsCount = unreadRequests.Count();
+                return Ok(unreadRequestsCount);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"An error occurred in: {nameof(GetAllRequests)}, exception: {ex.Message}.");
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
         public class RequestCounts
         {
             public int UnreadRequests { get; set; }
@@ -415,28 +434,55 @@ namespace Clipess.API.Controllers
             public int PendingRequests { get; set; }
         }
 
-        [Route("requestCounts")]
+        [Route("requestCounts/{employeeId?}")]
         [HttpGet]
-        public ActionResult GetRequestCounts()
+        public ActionResult GetRequestCounts(int? employeeId)
         {
             try
             {
-                var unreadRequests = _requestRepository.GetNoOfUnreadRequests().Where(x => !x.Deleted && !x.IsRead).ToList();
-                var totalRequests = _requestRepository.GetNoOfAllRequests().Where(i => !i.Deleted && i.InventoryTypeId != 0).ToList();
-                var acceptedRequests = _requestRepository.GetNoOfAcceptedRequests().Where(x => !x.Deleted && x.InventoryId != 0 && x.IsRead && !x.Rejected).ToList();
-                var rejectedRequests = _requestRepository.GetNoOfRejectedRequests().Where(x => !x.Deleted && x.Rejected && x.IsRead && x.InventoryId == 0).ToList();
-                var pendingRequests = _requestRepository.GetNoOfPendingRequests().Where(x => !x.Deleted && x.IsRead && !x.Rejected && x.InventoryId == 0).ToList();
-
-                var response = new RequestCounts
+                if (employeeId.HasValue)
                 {
-                    UnreadRequests = unreadRequests.Count(),
-                    TotalRequests = totalRequests.Count(),
-                    AcceptedRequests = acceptedRequests.Count(),
-                    RejectedRequests = rejectedRequests.Count(),
-                    PendingRequests = pendingRequests.Count()
-                };
 
-                return Ok(response);
+
+                    var unreadRequests = _requestRepository.GetNoOfUnreadRequests().Where(x => !x.Deleted && !x.IsRead && x.EmployeeId == employeeId).ToList();
+                    var totalRequests = _requestRepository.GetNoOfAllRequests().Where(x => !x.Deleted && x.InventoryTypeId != 0 && x.EmployeeId == employeeId).ToList();
+                    var acceptedRequests = _requestRepository.GetNoOfAcceptedRequests().Where(x => !x.Deleted && x.InventoryId != 0 && x.IsRead && !x.Rejected && x.EmployeeId == employeeId).ToList();
+                    var rejectedRequests = _requestRepository.GetNoOfRejectedRequests().Where(x => !x.Deleted && x.Rejected && x.IsRead && x.InventoryId == 0 && x.EmployeeId == employeeId).ToList();
+                    var pendingRequests = _requestRepository.GetNoOfPendingRequests().Where(x => !x.Deleted && x.IsRead && !x.Rejected && x.InventoryId == 0 && x.EmployeeId == employeeId).ToList();
+
+                    var response = new RequestCounts
+                    {
+                        UnreadRequests = unreadRequests.Count(),
+                        TotalRequests = totalRequests.Count(),
+                        AcceptedRequests = acceptedRequests.Count(),
+                        RejectedRequests = rejectedRequests.Count(),
+                        PendingRequests = pendingRequests.Count()
+                    };
+                    return Ok(response);
+
+                }
+
+                else
+                {
+                    var unreadRequests = _requestRepository.GetNoOfUnreadRequests().Where(x => !x.Deleted && !x.IsRead).ToList();
+                    var totalRequests = _requestRepository.GetNoOfAllRequests().Where(x => !x.Deleted && x.InventoryTypeId != 0).ToList();
+                    var acceptedRequests = _requestRepository.GetNoOfAcceptedRequests().Where(x => !x.Deleted && x.InventoryId != 0 && x.IsRead && !x.Rejected).ToList();
+                    var rejectedRequests = _requestRepository.GetNoOfRejectedRequests().Where(x => !x.Deleted && x.Rejected && x.IsRead && x.InventoryId == 0).ToList();
+                    var pendingRequests = _requestRepository.GetNoOfPendingRequests().Where(x => !x.Deleted && x.IsRead && !x.Rejected && x.InventoryId == 0).ToList();
+
+                    var response = new RequestCounts
+                    {
+                        UnreadRequests = unreadRequests.Count(),
+                        TotalRequests = totalRequests.Count(),
+                        AcceptedRequests = acceptedRequests.Count(),
+                        RejectedRequests = rejectedRequests.Count(),
+                        PendingRequests = pendingRequests.Count()
+                    };
+                    return Ok(response);
+
+                }
+
+
             }
             catch (Exception ex)
             {
@@ -444,6 +490,7 @@ namespace Clipess.API.Controllers
                 return StatusCode(500, $"An error occurred while fetching request counts: {ex.Message}");
             }
         }
+
 
 
     }

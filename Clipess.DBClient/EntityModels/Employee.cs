@@ -71,4 +71,9 @@ namespace Clipess.DBClient.EntityModels
         public Dictionary<string, int> DepartmentCounts { get; set; }
     }
 
+    public class LeaveEmployeeDto
+    {
+        public int EmployeeID { get; set; }
+        //public string RoleName { get; set; }
+    }
 }

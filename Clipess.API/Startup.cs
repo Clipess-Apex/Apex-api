@@ -109,6 +109,7 @@ namespace Clipess.API
             services.AddScoped<IEmployeeInventoryRepository, EFEmployeeInventoryRepository>();
             services.AddScoped<IRequestRepository, EFRequestRepository>();
             services.AddScoped<IInventoryReportRepository, EFInventoryReportRepository>();
+            services.AddScoped<IInventoryUserNotificationRepository, EFInventoryUserNotificationRepository>();
 
             services.AddScoped<IEmployeeRepository, EFEmployeeRepository>();            
             services.AddScoped<IEmployeeTypeRepository, EFEmployeeTypeRepository>();

@@ -6,8 +6,9 @@ namespace Clipess.DBClient.Contracts
 {
     public interface ILeaveNotificationRepository
     {
-        Task<bool> CreateNotification(int employeeId, int leaveId, string message, int managerId);
+        Task<bool> CreateNotificationsForManagers(int employeeId, int leaveId, string message, List<int> managerIds);
         Task<List<ManagerGetNotification>> GetNotificationsForManager(int sendTo);
         Task<bool> MarkNotificationAsRead(int notificationId);
+        Task<bool> CreateNotificationsForEmployee(int employeeId, int leaveId, string message, int managerId);
     }
 }

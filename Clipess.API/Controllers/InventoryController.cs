@@ -448,6 +448,26 @@ namespace Clipess.API.Controllers
 
          }
 
+        [Route("totalInventories/{employeeId}")]
+        [HttpGet]
+        public ActionResult GetTotalNoOfInventories(int employeeId)
+        {
+            try
+            {
+                var TotalInventories = _inventoryRepository.GetTotalNoOfInventories().Where(i => !i.Deleted && i.InventoryTypeId != 0 && i.EmployeeId==employeeId).ToList();
+
+                var lengthOfTotalInventories = TotalInventories.Count();
+
+                return Ok(lengthOfTotalInventories);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"An error occurred in {nameof(GetInventoryAssignData)}: {ex.Message}");
+                return StatusCode(500, $"An error occurred while fetching inventory data: {ex.Message}");
+            }
+
+        }
+
         [Route("inventoriesCountByType")]
         [HttpGet]
         public ActionResult GetNoOfInventoryOfAllType()

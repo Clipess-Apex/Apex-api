@@ -397,6 +397,24 @@ namespace Clipess.API.Controllers
             }
         }
 
+        //meka vitharai bhashige api asse mn gahuwe
+        [HttpGet]
+        [Route("employeeName/{employeeId}")]
+        public async Task<IActionResult> GetEmployeeName(int employeeId)
+        {
+            if (employeeId <= 0)
+            {
+                return BadRequest("Invalid employee ID.");
+            }
 
+            var employeeName = await _employeeRepository.GetEmployeeNameById(employeeId);
+
+            if (string.IsNullOrEmpty(employeeName))
+            {
+                return NotFound("Employee not found.");
+            }
+
+            return Ok(employeeName);
+        }
     }
 }
