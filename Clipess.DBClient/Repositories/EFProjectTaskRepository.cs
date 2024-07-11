@@ -163,7 +163,8 @@ namespace Clipess.DBClient.Repositories
         }
         public List<FormUser> GetFormUsers()
         {
-            return DbContext.Employees
+            return DbContext.Employees.
+                Where(x=>!x.Deleted)
                 .Select(x => new FormUser
                 {
                     EmployeeID = x.EmployeeID,
