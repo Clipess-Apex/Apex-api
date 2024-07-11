@@ -17,9 +17,9 @@ namespace Clipess.DBClient.Repositories
             DbContext = dbContext;
         }
 
-        public async Task<bool> CreateNotification(int employeeId, int leaveId, string message, int managerId)
+        public async Task<bool> CreateNotificationsForManagers(int employeeId, int leaveId, string message, List<int> managerIds)
         {
-            var notification = new LeaveNotification
+            var notifications = managerIds.Select(managerId => new LeaveNotification
             {
                 EmployeeId = employeeId,
                 LeaveId = leaveId,
@@ -31,9 +31,9 @@ namespace Clipess.DBClient.Repositories
                 Read_at = null,
                 Send_To = managerId,
                 Send_By = employeeId
-            };
+            }).ToList();
 
-            DbContext.LeaveNotifications.Add(notification);
+            DbContext.LeaveNotifications.AddRange(notifications);
             await DbContext.SaveChangesAsync();
             return true;
         }
@@ -41,35 +41,63 @@ namespace Clipess.DBClient.Repositories
         public async Task<List<ManagerGetNotification>> GetNotificationsForManager(int sendTo)
         {
             var notifications = await DbContext.LeaveNotifications
-                .Where(n => n.Send_To == sendTo && !n.IsRead == false)
+                .Include (n => n.Leave)
+                .Where(n => n.Send_To == sendTo && !n.IsRead && n.Leave.StatusId == 1)
                 .ToListAsync();
 
-            return notifications.Select(n => new ManagerGetNotification
-            {
-                LeaveId = n.LeaveId,
-                Message = n.Message,
-                EmployeeId = n.EmployeeId,
-                Created_at = n.Created_at
-            })
-            .ToList();
+            // Map to ManagerGetNotification with only Id and Message
+            var managerNotifications = notifications
+                .Select(n => new ManagerGetNotification(n.LeaveId, n.Message))
+                .ToList();
+
+            return managerNotifications;
         }
+
+
 
 
         public async Task<bool> MarkNotificationAsRead(int notificationId)
         {
             var notification = await DbContext.LeaveNotifications.FindAsync(notificationId);
-
             if (notification == null)
             {
                 return false;
             }
 
             notification.IsRead = true;
-            notification.Read_at = DateTime.Now;
-            DbContext.LeaveNotifications.Update(notification);
-            await DbContext.SaveChangesAsync();
-            return true;
+            notification.Read_at = DateTime.UtcNow; 
+            var result = await DbContext.SaveChangesAsync();
+            return result > 0;
         }
+
+        public async Task<bool> CreateNotificationsForEmployee(int employeeId, int leaveId, string message, int managerId)
+        {
+            try
+            {
+                var notification = new LeaveNotification
+                {
+                    EmployeeId = employeeId,
+                    LeaveId = leaveId,
+                    Message = message,
+                    ManagerId = managerId,
+                    Send_To = managerId,
+                    Send_By = employeeId,
+                    Created_at = DateTime.UtcNow,
+                    IsRead = false
+                };
+
+                await DbContext.LeaveNotifications.AddAsync(notification);
+                await DbContext.SaveChangesAsync();
+
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+
 
     }
 }

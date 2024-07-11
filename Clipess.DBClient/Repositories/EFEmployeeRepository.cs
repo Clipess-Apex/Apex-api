@@ -139,6 +139,21 @@ namespace Clipess.DBClient.Repositories
                 Employee = employee
             };
         }
+
+        public async Task<List<int>> GetAllManagerIds()
+        {
+            return await DbContext.Employees
+                .Where(e => e.role.RoleName == "Manager" && e.Deleted == false)
+                .Select(e => e.EmployeeID)
+                .ToListAsync();
+        }
+
+        public async Task<string> GetEmployeeNameById(int employeeId)
+        {
+            var employee = await DbContext.Employees.FindAsync(employeeId);
+            return employee != null ? $"{employee.FirstName} {employee.LastName}" : null;
+        }
+
     }
 }
  
