@@ -8,5 +8,6 @@ namespace Clipess.DBClient.Contracts
         int CheckNextMonthMonthlyTimeEntries();
         IQueryable<TimeEntryNotification> GetTimeEntryNotifications(int employeeId);
         Task<List<TimeEntryNotification>> CreateTimeEntryNotifications();
+        Task<TimeEntryNotification> HideTimeEntryNotification(int notificationId);
     }
 }
