@@ -1,26 +1,4 @@
-﻿/*using Clipess.DBClient.EntityModels;
-using System.Runtime.InteropServices;
-
-namespace Clipess.DBClient.Contracts
-{
-    public interface IInventoryRepository
-
-    {
-        IQueryable<Inventory> GetInventories();
-
-        void AddInventory(Inventory inventory);
-
-        // IQueryable<Inventory> GetInventoryByEmployeeOrType(int? employeeId, int? inventoryTypeId);
-
-        public IQueryable<Inventory> GetInventoryByEmployeeOrType(int? employeeId, int? typeId);
-
-
-
-        void SaveChanges();
-    }
-
-   
-}*/
+﻿
 using Clipess.DBClient.EntityModels;
 using Clipess.DBClient.Repositories;
 using System.Linq;
