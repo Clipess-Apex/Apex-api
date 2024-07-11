@@ -126,7 +126,7 @@ namespace Clipess.API.Controllers
                     Address = otherData.Address,
                     Designation = otherData.Designation,
                     ImageUrl = null,
-                    FileUrl = null, 
+                    FileUrl = null,
                     EmergencyContactPersonName = otherData.EmergencyContactPersonName,
                     EmergencyContactPersonMobileNumber = otherData.EmergencyContactPersonMobileNumber,
                     EmergencyContactPersonAddress = otherData.EmergencyContactPersonAddress,
@@ -252,7 +252,7 @@ namespace Clipess.API.Controllers
                         employeeToUpdate.Address = otherData.Address;
                         employeeToUpdate.Designation = otherData.Designation;
                         employeeToUpdate.ImageUrl = null;
-                        employeeToUpdate.FileUrl = null; 
+                        employeeToUpdate.FileUrl = null;
                         employeeToUpdate.EmergencyContactPersonName = otherData.EmergencyContactPersonName;
                         employeeToUpdate.EmergencyContactPersonMobileNumber = otherData.EmergencyContactPersonMobileNumber;
                         employeeToUpdate.EmergencyContactPersonAddress = otherData.EmergencyContactPersonAddress;
@@ -352,11 +352,13 @@ namespace Clipess.API.Controllers
                 }
 
                 employeeToDelete.Deleted = request.Deleted;
+                employeeToDelete.DeletedDate = request.Deleted ? DateTime.Now : (DateTime?)null;
+                employeeToDelete.DeletedBy = request.DeletedBy;
 
                 await _employeeRepository.UpdateEmployee(employeeToDelete);
                 return Ok(employeeToDelete);
             }
-            catch(Exception ex) 
+            catch (Exception ex)
             {
                 _logger.Error($"An error cccurred in: {nameof(UpdateDeleteStatus)},exception: {ex.Message}.");
                 return BadRequest();
@@ -371,6 +373,22 @@ namespace Clipess.API.Controllers
             {
                 var counts = await _employeeRepository.GetEmployeeCountsAsync();
                 return Ok(counts);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"An error occurred in: {nameof(GetEmployeeCounts)}, exception: {ex.Message}.");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal Server Error");
+            }
+        }
+
+        [HttpGet]
+        [Route("employee-count-by-department")]
+        public async Task<ActionResult<DepartmentEmployeeCountDto>> GetEmployeeCountByDepartment()
+        {
+            try
+            {
+                var employeeCountByDepartments = await _employeeRepository.GetEmployeeCountByDepartmentAsync();
+                return Ok(employeeCountByDepartments);
             }
             catch (Exception ex)
             {

@@ -126,17 +126,45 @@ namespace Clipess.DBClient.Repositories
 
         public async Task<EmployeeCountsDto> GetEmployeeCountsAsync()
         {
-            var total = await DbContext.Employees.CountAsync();
-            var admin = await DbContext.Employees.CountAsync(e => e.RoleID == 1);
-            var manager = await DbContext.Employees.CountAsync(e => e.RoleID == 2);
-            var employee = await DbContext.Employees.CountAsync(e => e.RoleID == 3);
+            var total = await DbContext.Employees.Where (e => e.Deleted == false) .CountAsync();
+
+            var roleCounts = await DbContext.Roles
+                .Where(r => !r.Deleted)
+                .Select(r => new
+                {
+                    r.RoleName,
+                    Count = DbContext.Employees.Count(e => e.RoleID == r.RoleID && e.Deleted == false)
+                })
+                .ToListAsync();
+
+            var roleCountsDict = roleCounts.ToDictionary(r => r.RoleName, r => r.Count);
 
             return new EmployeeCountsDto
             {
                 Total = total,
-                Admin = admin,
-                Manager = manager,
-                Employee = employee
+                RoleCounts = roleCountsDict
+            };
+        }
+
+        public async Task<DepartmentEmployeeCountDto> GetEmployeeCountByDepartmentAsync()
+        {
+            var total = await DbContext.Employees.Where(e => e.Deleted == false).CountAsync();
+
+            var departmentCounts = await DbContext.Departments
+                .Where(d => !d.Deleted)
+                .Select(d => new
+                {
+                    d.DepartmentName,
+                    Count = DbContext.Employees.Count(e => e.DepartmentID == d.DepartmentID && e.Deleted == false)
+                })
+                .ToListAsync();
+
+            var departmentCountsDict = departmentCounts.ToDictionary(d => d.DepartmentName, d => d.Count);
+
+            return new DepartmentEmployeeCountDto
+            {
+                DepartmentEmployeeCountTotal = total,
+                DepartmentCounts = departmentCountsDict
             };
         }
 
