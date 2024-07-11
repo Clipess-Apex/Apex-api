@@ -37,6 +37,7 @@ namespace Clipess.DBClient.EntityModels
         public bool Deleted { get; set; }
         public DateTime? DeletedDate { get; set; }
         public int? DeletedBy { get; set; }
+        public Role? role { get; set; }
     }
 
     public class LoginModel
@@ -66,4 +67,9 @@ namespace Clipess.DBClient.EntityModels
         public int Employee { get; set; }
     }
 
+    public class LeaveEmployeeDto
+    {
+        public int EmployeeID { get; set; }
+        //public string RoleName { get; set; }
+    }
 }

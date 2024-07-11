@@ -21,5 +21,7 @@ namespace Clipess.DBClient.Contracts
         Task<Employee> GetEmployeeByEmail(string companyEmail);
         Task<bool> ResetPassword(Employee user, string newPassword);
         Task<EmployeeCountsDto> GetEmployeeCountsAsync();
+        Task<List<int>> GetAllManagerIds();
+        Task<string> GetEmployeeNameById(int employeeId);
     }
 }
