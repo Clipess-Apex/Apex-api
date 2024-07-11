@@ -268,10 +268,15 @@ namespace Clipess.API
 
               app.UseHangfireDashboard();
 
-            //RecurringJob.AddOrUpdate<PdfGenerationController>(
-            //"Generate-PDF",
-            //controller => controller.GenerateEmployeeAttendancePDF(),
-            // "25 23 * * *");
+            RecurringJob.AddOrUpdate<PdfGenerationController>(
+            "Generate-PDF",
+            controller => controller.GenerateEmployeeAttendancePDF(),
+             "*/30 * * * *");
+
+            RecurringJob.AddOrUpdate<AttendanceNotificationControler>(
+                "Generate-Notification",
+                controller => controller.CreateTimeEntryNotification(),
+                "*/30 * * * *");
         }
     }
 

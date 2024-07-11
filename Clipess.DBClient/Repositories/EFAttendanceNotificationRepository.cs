@@ -77,7 +77,7 @@ namespace Clipess.DBClient.Repositories
                 var timeEntryNotification = new TimeEntryNotification
                 {
                     Month =nextMonthString,
-                    Message = $" You have not Created the records for {nextMonthString}",
+                    Message = $" You have not Created the Monthly Time Entries for {nextMonthString}",
                     ReadBy = x,
                     CreatedDate = DateTime.Now
                 };
@@ -90,6 +90,22 @@ namespace Clipess.DBClient.Repositories
             return timeEntryNotifications;
 
              
+        }
+
+        public async Task<TimeEntryNotification> HideTimeEntryNotification(int notificationId)
+        {
+            var notification = _DbContext.TimeEntryNotifications.FirstOrDefault(x => x.Id == notificationId);
+
+            if (notification == null) 
+            {
+                return null;
+            }
+
+            notification.IsRead = true;
+
+            _DbContext.SaveChanges();
+
+            return notification;
         }
     }
 }

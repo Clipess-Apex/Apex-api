@@ -57,7 +57,9 @@ namespace Clipess.API.Controllers
                 var timeEntryNotification = _attendanceNotificationRepository.GetTimeEntryNotifications(employeeId).Select(x => new
                 {
                     x.Id,
+                    x.ReadBy,
                     x.Message,
+                    x.IsRead,
                     CreatedDate = x.CreatedDate.ToString("yyyy-MM-dd hh:mm tt")
                 }).ToList();
 
@@ -75,6 +77,21 @@ namespace Clipess.API.Controllers
                 _logger.Error($"An error has occured in: {nameof(GetTimeEntryNotification)} , exception: {ex.Message}.");
                 return BadRequest();
             }
+        }
+
+
+        [HttpDelete]
+        [Route("HideTimeEntryNotification")]
+        public async Task<IActionResult> HideTimeEntryNotification([FromQuery] int notificationId)
+        {
+            var notification = await _attendanceNotificationRepository.HideTimeEntryNotification(notificationId);
+
+            if(notification == null)
+            {
+                return NoContent();
+            }
+
+            return Ok(notification);
         }
     }
 }

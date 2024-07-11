@@ -28,9 +28,9 @@ namespace Clipess.API.Controllers
 
             _cloudinary = new Cloudinary(new Account
             {
-                Cloud = _configuration["CloudinarySettings:CloudName"],
-                ApiKey = _configuration["CloudinarySettings:ApiKey"],
-                ApiSecret = _configuration["CloudinarySettings:ApiSecret"]
+                Cloud = _configuration["Cloudinary:CloudName"],
+                ApiKey = _configuration["Cloudinary:ApiKey"],
+                ApiSecret = _configuration["Cloudinary:ApiSecret"]
             });
             _logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         }
@@ -48,7 +48,7 @@ namespace Clipess.API.Controllers
         public  void GenerateEmployeeAttendancePDF()
         {
             string month = DateTime.UtcNow.ToString("yyyy-MM");
-            
+         
             var allEmployeeIds = _pdfGenerationRepository.GetEmployee().ToList();
 
             foreach (var employeeId in allEmployeeIds)
