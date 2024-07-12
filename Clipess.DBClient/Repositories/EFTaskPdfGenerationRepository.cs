@@ -10,10 +10,12 @@ namespace Clipess.DBClient.Repositories
         public EFDbContext _DbContext { get; set; }
 
         private readonly ITaskRepository _taskRepository;
-        public EFTaskPdfGenerationRepository(EFDbContext dbContext, ITaskRepository taskRepository)
+        private readonly IProjectRepository _projectRepository;
+        public EFTaskPdfGenerationRepository(EFDbContext dbContext, ITaskRepository taskRepository, IProjectRepository projectRepository)
         {
             _DbContext = dbContext;
             _taskRepository = taskRepository;
+            _projectRepository = projectRepository;
         }
 
         public async Task<List<ProjectTaskPdf>> GetTaskReport(List<int> taskId,int EmployeeID)
@@ -21,7 +23,7 @@ namespace Clipess.DBClient.Repositories
             var finalResultsArray = new List<ProjectTaskPdf >();
             foreach (var item in taskId)
             {
-
+                var getProjects =  _projectRepository.GetFormProjects();
                 var getTask = await _taskRepository.GetTask(item);
                 if (getTask == null)
                 {
@@ -46,13 +48,22 @@ namespace Clipess.DBClient.Repositories
                      assignedDate = getTask.AssignedDate.Value.ToString("yyyy-MM-dd");
                 }
 
+                string ProjectName = "";
+
+                foreach (var data in getProjects)
+                {
+                    if (data.ProjectId == getTask.ProjectId)
+                    {
+                        ProjectName = data.ProjectName;
+                    }
+                }
 
 
                 var finalResults = new ProjectTaskPdf
                 {
                     TaskId = getTask.TaskId,
                     TaskName = getTask.TaskName,
-                    StartDate = getTask.StartDate.ToString("yyyy-MM-dd"),
+                    Project = ProjectName,
                     EndDate = getTask.EndDate.ToString("yyyy-MM-dd"),
                     AssignedDate = assignedDate,
                     CreatedDate = getTask.CreatedDate.ToString("yyyy-MM-dd"),

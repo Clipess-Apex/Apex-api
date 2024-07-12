@@ -93,6 +93,7 @@ namespace Clipess.API.Controllers
                         x.Item().Text($"Employee ID: {EmployeeId}").AlignLeft().FontSize(21).FontFamily("Roboto", "Calibri", "Noto Color Emoji")
                         .FontColor(Colors.Black).SemiBold();
 
+
                         
 
                         x.Item()
@@ -129,7 +130,7 @@ namespace Clipess.API.Controllers
 
                                 header.Cell().Element(CellStyle).Text("Task ID");
                                 header.Cell() .Element(CellStyle).Text("Task Name");
-                                header.Cell().Element(CellStyle).Text("Start Date");
+                                header.Cell().Element(CellStyle).Text("Project");
                                 header.Cell().Element(CellStyle).Text("End Date");
                                 header.Cell().Element(CellStyle).Text("Assigned Date");
                                 header.Cell().Element(CellStyle).Text("Task Status");
@@ -144,7 +145,7 @@ namespace Clipess.API.Controllers
                                 
                                 table.Cell().Element(CellStyle).Text(task.TaskId);
                                 table.Cell().Element(CellStyle).Text(task.TaskName);
-                                table.Cell().Element(CellStyle).Text(task.StartDate);
+                                table.Cell().Element(CellStyle).Text(task.Project);
                                 table.Cell().Element(CellStyle).Text(task.EndDate);
                                 table.Cell().Element(CellStyle).Text(task.AssignedDate);
                                 table.Cell().Element(CellStyle).Text(task.TaskStatus);

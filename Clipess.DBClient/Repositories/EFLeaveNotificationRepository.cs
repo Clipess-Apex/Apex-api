@@ -38,19 +38,32 @@ namespace Clipess.DBClient.Repositories
             return true;
         }
 
-        public async Task<List<ManagerGetNotification>> GetNotificationsForManager(int sendTo)
+        public IQueryable <LeaveNotification> GetNotificationsForManager(int sendTo)
         {
-            var notifications = await DbContext.LeaveNotifications
-                .Include (n => n.Leave)
-                .Where(n => n.Send_To == sendTo && !n.IsRead && n.Leave.StatusId == 1)
-                .ToListAsync();
+            //var notifications = await DbContext.LeaveNotifications
+            //    .Include (n => n.Leave)
+            //    .Where(n => n.Send_To == sendTo && !n.IsRead && n.Leave.StatusId == 1)
+            //    .ToListAsync();
 
-            // Map to ManagerGetNotification with only Id and Message
-            var managerNotifications = notifications
-                .Select(n => new ManagerGetNotification(n.LeaveId, n.Message))
-                .ToList();
+            //// Map to ManagerGetNotification with only Id and Message
+            //var managerNotifications = notifications
+            //    .Select(n => new ManagerGetNotification(n.LeaveId, n.Message))
+            //    .ToList();
 
-            return managerNotifications;
+            //return managerNotifications;
+
+            var notifications = DbContext.LeaveNotifications.Where(x => x.ManagerId == sendTo);
+
+            var updatedNotifications = notifications.Include(x => x.Leave);
+
+            var correctNotification = updatedNotifications.Where(x => x.Leave.StatusId == 1);
+
+            if(notifications == null)
+            {
+                return null;
+            }
+
+            return correctNotification;
         }
 
 

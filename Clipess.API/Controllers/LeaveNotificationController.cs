@@ -75,24 +75,19 @@ namespace Clipess.API.Controllers
         }
 
         [HttpGet]
-        [Route("managerUnread/{sendTo}")]
-        public async Task<IActionResult> GetNotificationsForManager(int sendTo)
+        [Route("managerUnread")]
+        public async Task<IActionResult> GetNotificationsForManager([FromQuery] int sendTo)
         {
             try
             {
-                if (sendTo <= 0)
+                var notifications = _leaveNotificationRepository.GetNotificationsForManager(sendTo);
+
+                if(notifications == null)
                 {
-                    return BadRequest("Invalid manager ID.");
+                    return NoContent();
                 }
 
-                var unreadNotifications = await _leaveNotificationRepository.GetNotificationsForManager(sendTo);
-
-                if (!unreadNotifications.Any())
-                {
-                    return NotFound("No unread notifications found for the manager.");
-                }
-
-                return Ok(unreadNotifications);
+                return Ok(notifications);
             }
             catch (Exception ex)
             {
