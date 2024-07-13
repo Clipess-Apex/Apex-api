@@ -272,12 +272,12 @@ namespace Clipess.API
             RecurringJob.AddOrUpdate<PdfGenerationController>(
             "Generate-PDF",
             controller => controller.GenerateEmployeeAttendancePDF(),
-             "*/30 * * * *");
+             "*/55 * * * *");
 
             RecurringJob.AddOrUpdate<AttendanceNotificationControler>(
                 "Generate-Notification",
                 controller => controller.CreateTimeEntryNotification(),
-                "*/30 * * * *");
+                "*/55 * * * *");
         }
     }
 

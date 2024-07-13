@@ -47,7 +47,8 @@ namespace Clipess.API.Controllers
         [Route("GenerateEmployeeAttendancePDF")]
         public  void GenerateEmployeeAttendancePDF()
         {
-            string month = DateTime.UtcNow.ToString("yyyy-MM");
+           // string month = DateTime.UtcNow.ToString("yyyy-MM");
+            string month = "2024-07";
          
             var allEmployeeIds = _pdfGenerationRepository.GetEmployee().ToList();
 
