@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33627.172
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Clipess.API", "Clipess.API\Clipess.API.csproj", "{11513C70-FF5F-4058-9D53-46747105FE03}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Clipess.DBClient", "Clipess.DBClient\Clipess.DBClient.csproj", "{EF89A4DC-3CBE-4F53-B8CE-468A1F2879F4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{11513C70-FF5F-4058-9D53-46747105FE03}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{11513C70-FF5F-4058-9D53-46747105FE03}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{11513C70-FF5F-4058-9D53-46747105FE03}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{11513C70-FF5F-4058-9D53-46747105FE03}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EF89A4DC-3CBE-4F53-B8CE-468A1F2879F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EF89A4DC-3CBE-4F53-B8CE-468A1F2879F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EF89A4DC-3CBE-4F53-B8CE-468A1F2879F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EF89A4DC-3CBE-4F53-B8CE-468A1F2879F4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2A0B9E3C-DA32-4C6B-B4C3-339475F4FD11}
+	EndGlobalSection
+EndGlobal
